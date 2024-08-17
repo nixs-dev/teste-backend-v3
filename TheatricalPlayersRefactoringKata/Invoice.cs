@@ -5,15 +5,15 @@ namespace TheatricalPlayersRefactoringKata;
 public class Invoice
 {
     private string _customer;
-    private List<Performance> _performances;
+    private List<AbstractPerformance> _performances;
 
     public string Customer { get => _customer; set => _customer = value; }
-    public List<Performance> Performances { get => _performances; set => _performances = value; }
+    public List<AbstractPerformance> Performances { get => _performances; set => _performances = value; }
 
-    public Invoice(string customer, List<Performance> performance)
+    public Invoice(string customer, List<AbstractPerformance> performances)
     {
         this._customer = customer;
-        this._performances = performance;
+        this._performances = performances;
     }
 
 }
