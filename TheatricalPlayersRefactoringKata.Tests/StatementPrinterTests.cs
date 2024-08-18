@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using ApprovalTests;
 using ApprovalTests.Reporters;
-using TheatricalPlayersRefactoringKata.PrinterTypes;
+using TheatricalPlayersRefactoringKata.Models;
+using TheatricalPlayersRefactoringKata.Tools;
+using TheatricalPlayersRefactoringKata.Tools.PrinterTypes;
 using Xunit;
 
 namespace TheatricalPlayersRefactoringKata.Tests;
@@ -13,22 +15,42 @@ public class StatementPrinterTests
     [UseReporter(typeof(DiffReporter))]
     public void TestStatementExampleLegacy()
     {
-        Dictionary<string, Play> plays = new Dictionary<string, Play>()
-        {
-            { "hamlet", new Play("Hamlet", 4024, "tragedy") },
-            { "as-you-like-it", new Play("As You Like It", 2670, "comedy") },
-            { "othello", new Play("Othello", 3560, "tragedy") }
-        };    
+        Invoice invoice = new Invoice();
+        invoice.Customer = "BigCo";
 
-        Invoice invoice = new Invoice(
-            "BigCo",
-            new List<AbstractPerformance>
-            {
-                PerformanceFactory.Build(plays["hamlet"], 55),
-                PerformanceFactory.Build(plays["as-you-like-it"], 35),
-                PerformanceFactory.Build(plays["othello"], 40)
-            }
-        );
+        Play hamletPlay = new Play();
+        hamletPlay.Name = "Hamlet";
+        hamletPlay.Lines = 4024;
+        hamletPlay.Type = "tragedy";
+
+        Play asYouLikePlay = new Play();
+        asYouLikePlay.Name = "As You Like It";
+        asYouLikePlay.Lines = 2670;
+        asYouLikePlay.Type = "comedy";
+
+        Play othelloPlay = new Play();
+        othelloPlay.Name = "Othello";
+        othelloPlay.Lines = 3560;
+        othelloPlay.Type = "tragedy";
+
+        Performance hamletPerformance = new Performance();
+        hamletPerformance.Invoice = invoice;
+        hamletPerformance.Play = hamletPlay;
+        hamletPerformance.Audience = 55;
+
+
+        Performance asYouLikePerformance = new Performance();
+        asYouLikePerformance.Invoice = invoice;
+        asYouLikePerformance.Play = asYouLikePlay;
+        asYouLikePerformance.Audience = 35;
+
+        Performance othelloPerformance = new Performance();
+        othelloPerformance.Invoice = invoice;
+        othelloPerformance.Play = othelloPlay;
+        othelloPerformance.Audience = 40;
+
+        invoice.Performances = new List<Performance> { hamletPerformance, asYouLikePerformance, othelloPerformance };
+
 
         AbstractStatementPrinter statementPrinter = new TextPrinter();
         var result = statementPrinter.Print(invoice);
@@ -40,27 +62,74 @@ public class StatementPrinterTests
     [UseReporter(typeof(DiffReporter))]
     public void TestTextStatementExample()
     {
-        Dictionary<string, Play> plays = new Dictionary<string, Play>()
-        {
-            { "hamlet", new Play("Hamlet", 4024, "tragedy") },
-            { "as-you-like-it", new Play("As You Like It", 2670, "comedy") },
-            { "othello", new Play("Othello", 3560, "tragedy") },
-            { "henry-v", new Play("Henry V", 3227, "history") },
-            { "king-john", new Play("King John", 2648, "history") }
-        };
+        Invoice invoice = new Invoice();
+        invoice.Customer = "BigCo";
 
-        Invoice invoice = new Invoice(
-            "BigCo",
-            new List<AbstractPerformance>
-            {
-                PerformanceFactory.Build(plays["hamlet"], 55),
-                PerformanceFactory.Build(plays["as-you-like-it"], 35),
-                PerformanceFactory.Build(plays["othello"], 40),
-                PerformanceFactory.Build(plays["henry-v"], 20),
-                PerformanceFactory.Build(plays["king-john"], 39),
-                PerformanceFactory.Build(plays["henry-v"], 20)
-            }
-        );
+        Play hamletPlay = new Play();
+        hamletPlay.Name = "Hamlet";
+        hamletPlay.Lines = 4024;
+        hamletPlay.Type = "tragedy";
+
+        Play asYouLikeItPlay = new Play();
+        asYouLikeItPlay.Name = "As You Like It";
+        asYouLikeItPlay.Lines = 2670;
+        asYouLikeItPlay.Type = "comedy";
+
+        Play othelloPlay = new Play();
+        othelloPlay.Name = "Othello";
+        othelloPlay.Lines = 3560;
+        othelloPlay.Type = "tragedy";
+
+        Play henryVPlay = new Play();
+        henryVPlay.Name = "Henry V";
+        henryVPlay.Lines = 3227;
+        henryVPlay.Type = "history";
+
+        Play kingJohnPlay = new Play();
+        kingJohnPlay.Name = "King John";
+        kingJohnPlay.Lines = 2648;
+        kingJohnPlay.Type = "history";
+
+        Performance hamletPerformance = new Performance();
+        hamletPerformance.Invoice = invoice;
+        hamletPerformance.Play = hamletPlay;
+        hamletPerformance.Audience = 55;
+
+        Performance asYouLikeItPerformance = new Performance();
+        asYouLikeItPerformance.Invoice = invoice;
+        asYouLikeItPerformance.Play = asYouLikeItPlay;
+        asYouLikeItPerformance.Audience = 35;
+
+        Performance othelloPerformance = new Performance();
+        othelloPerformance.Invoice = invoice;
+        othelloPerformance.Play = othelloPlay;
+        othelloPerformance.Audience = 40;
+
+        Performance henryVPerformance = new Performance();
+        henryVPerformance.Invoice = invoice;
+        henryVPerformance.Play = henryVPlay;
+        henryVPerformance.Audience = 20;
+
+        Performance kingJohnPerformance = new Performance();
+        kingJohnPerformance.Invoice = invoice;
+        kingJohnPerformance.Play = kingJohnPlay;
+        kingJohnPerformance.Audience = 39;
+
+        Performance henryVPerformance2 = new Performance();
+        henryVPerformance2.Invoice = invoice;
+        henryVPerformance2.Play = henryVPlay;
+        henryVPerformance2.Audience = 20;
+
+        invoice.Performances = new List<Performance>
+        {
+            hamletPerformance,
+            asYouLikeItPerformance,
+            othelloPerformance,
+            henryVPerformance,
+            kingJohnPerformance,
+            henryVPerformance2
+        };
+        
 
         AbstractStatementPrinter statementPrinter = new TextPrinter();
         var result = statementPrinter.Print(invoice);
@@ -72,27 +141,73 @@ public class StatementPrinterTests
     [UseReporter(typeof(DiffReporter))]
     public void TestXmlStatementExample()
     {
-        Dictionary<string, Play> plays = new Dictionary<string, Play>()
-        {
-            { "hamlet", new Play("Hamlet", 4024, "tragedy") },
-            { "as-you-like-it", new Play("As You Like It", 2670, "comedy") },
-            { "othello", new Play("Othello", 3560, "tragedy") },
-            { "henry-v", new Play("Henry V", 3227, "history") },
-            { "king-john", new Play("King John", 2648, "history") }
-        };
+        Invoice invoice = new Invoice();
+        invoice.Customer = "BigCo";
 
-        Invoice invoice = new Invoice(
-            "BigCo",
-            new List<AbstractPerformance>
-            {
-                PerformanceFactory.Build(plays["hamlet"], 55),
-                PerformanceFactory.Build(plays["as-you-like-it"], 35),
-                PerformanceFactory.Build(plays["othello"], 40),
-                PerformanceFactory.Build(plays["henry-v"], 20),
-                PerformanceFactory.Build(plays["king-john"], 39),
-                PerformanceFactory.Build(plays["henry-v"], 20)
-            }
-        );
+        Play hamletPlay = new Play();
+        hamletPlay.Name = "Hamlet";
+        hamletPlay.Lines = 4024;
+        hamletPlay.Type = "tragedy";
+
+        Play asYouLikeItPlay = new Play();
+        asYouLikeItPlay.Name = "As You Like It";
+        asYouLikeItPlay.Lines = 2670;
+        asYouLikeItPlay.Type = "comedy";
+
+        Play othelloPlay = new Play();
+        othelloPlay.Name = "Othello";
+        othelloPlay.Lines = 3560;
+        othelloPlay.Type = "tragedy";
+
+        Play henryVPlay = new Play();
+        henryVPlay.Name = "Henry V";
+        henryVPlay.Lines = 3227;
+        henryVPlay.Type = "history";
+
+        Play kingJohnPlay = new Play();
+        kingJohnPlay.Name = "King John";
+        kingJohnPlay.Lines = 2648;
+        kingJohnPlay.Type = "history";
+
+        Performance hamletPerformance = new Performance();
+        hamletPerformance.Invoice = invoice;
+        hamletPerformance.Play = hamletPlay;
+        hamletPerformance.Audience = 55;
+
+        Performance asYouLikeItPerformance = new Performance();
+        asYouLikeItPerformance.Invoice = invoice;
+        asYouLikeItPerformance.Play = asYouLikeItPlay;
+        asYouLikeItPerformance.Audience = 35;
+
+        Performance othelloPerformance = new Performance();
+        othelloPerformance.Invoice = invoice;
+        othelloPerformance.Play = othelloPlay;
+        othelloPerformance.Audience = 40;
+
+        Performance henryVPerformance = new Performance();
+        henryVPerformance.Invoice = invoice;
+        henryVPerformance.Play = henryVPlay;
+        henryVPerformance.Audience = 20;
+
+        Performance kingJohnPerformance = new Performance();
+        kingJohnPerformance.Invoice = invoice;
+        kingJohnPerformance.Play = kingJohnPlay;
+        kingJohnPerformance.Audience = 39;
+
+        Performance henryVPerformance2 = new Performance();
+        henryVPerformance2.Invoice = invoice;
+        henryVPerformance2.Play = henryVPlay;
+        henryVPerformance2.Audience = 20;
+
+        invoice.Performances = new List<Performance>
+        {
+            hamletPerformance,
+            asYouLikeItPerformance,
+            othelloPerformance,
+            henryVPerformance,
+            kingJohnPerformance,
+            henryVPerformance2
+        };
 
         AbstractStatementPrinter statementPrinter = new XMLPrinter();
         var result = statementPrinter.Print(invoice);

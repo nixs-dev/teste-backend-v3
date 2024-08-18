@@ -1,10 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
+using TheatricalPlayersRefactoringKata.Models;
 
-namespace TheatricalPlayersRefactoringKata.PrinterTypes;
+namespace TheatricalPlayersRefactoringKata.Tools.PrinterTypes;
 
- public class XMLPrinter : AbstractStatementPrinter
+public class XMLPrinter : AbstractStatementPrinter
 {
     public override string Print(Invoice invoice)
     {
@@ -12,17 +11,20 @@ namespace TheatricalPlayersRefactoringKata.PrinterTypes;
         float totalAmount = 0;
         int totalCredits = 0;
 
-        foreach (AbstractPerformance performance in invoice.Performances) {
+        foreach (Performance performance in invoice.Performances)
+        {
+            AbstractPerformanceCalculator? performanceCalculator = PerformanceCalculatorFactory.Build(performance) ?? throw new Exception("Gênero inválido");
+
             XElement element = new XElement("Item",
-                new XElement("AmountOwed", performance.GetAmountOwned()),
-                new XElement("EarnedCredits", performance.GetCredits()),
+                new XElement("AmountOwed", performanceCalculator.GetAmountOwned()),
+                new XElement("EarnedCredits", performanceCalculator.GetCredits()),
                 new XElement("Seats", performance.Audience)
             );
 
             items.Add(element);
 
-            totalAmount += performance.GetAmountOwned();
-            totalCredits += performance.GetCredits();
+            totalAmount += performanceCalculator.GetAmountOwned();
+            totalCredits += performanceCalculator.GetCredits();
         }
 
         XDocument xmlOutput = new XDocument(
@@ -36,6 +38,7 @@ namespace TheatricalPlayersRefactoringKata.PrinterTypes;
                 new XElement("EarnedCredits", totalCredits)
             )
         );
+       
 
         return xmlOutput.ToString();
     }

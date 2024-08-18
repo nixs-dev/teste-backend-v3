@@ -1,7 +1,6 @@
-﻿namespace TheatricalPlayersRefactoringKata;
+﻿namespace TheatricalPlayersRefactoringKata.Tools;
 
-using System.Collections.Generic;
-
+using TheatricalPlayersRefactoringKata.Models;
 
 public abstract class AbstractStatementPrinter
 {
