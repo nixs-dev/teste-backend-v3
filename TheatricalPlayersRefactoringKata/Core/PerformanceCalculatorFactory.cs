@@ -1,11 +1,11 @@
 using TheatricalPlayersRefactoringKata.Models;
-using TheatricalPlayersRefactoringKata.Tools.PerformanceTypes;
+using TheatricalPlayersRefactoringKata.Core.PerformanceTypes;
 
-namespace TheatricalPlayersRefactoringKata.Tools;
+namespace TheatricalPlayersRefactoringKata.Core;
 
 public class PerformanceCalculatorFactory
 {
-    private static Dictionary<string, Func<Performance, object>> allowedTypes = new Dictionary<string, Func<Performance, object>> {
+    private static readonly Dictionary<string, Func<Performance, object>> allowedTypes = new Dictionary<string, Func<Performance, object>> {
         { "comedy", (performance) => new ComedyType(performance) },
         { "tragedy", (performance) => new TragedyType(performance) },
         { "history", (performance) => new HistoryType(performance) },

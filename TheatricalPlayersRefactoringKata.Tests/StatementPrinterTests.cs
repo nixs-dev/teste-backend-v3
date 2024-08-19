@@ -1,10 +1,9 @@
-using System;
 using System.Collections.Generic;
 using ApprovalTests;
 using ApprovalTests.Reporters;
 using TheatricalPlayersRefactoringKata.Models;
-using TheatricalPlayersRefactoringKata.Tools;
-using TheatricalPlayersRefactoringKata.Tools.PrinterTypes;
+using TheatricalPlayersRefactoringKata.Core;
+using TheatricalPlayersRefactoringKata.Core.PrinterTypes;
 using Xunit;
 
 namespace TheatricalPlayersRefactoringKata.Tests;
@@ -52,8 +51,8 @@ public class StatementPrinterTests
         invoice.Performances = new List<Performance> { hamletPerformance, asYouLikePerformance, othelloPerformance };
 
 
-        AbstractStatementPrinter statementPrinter = new TextPrinter();
-        var result = statementPrinter.Print(invoice);
+        AbstractStatementPrinter statementPrinter = new TextPrinter(invoice);
+        var result = statementPrinter.Print();
 
         Approvals.Verify(result);
     }
@@ -131,8 +130,8 @@ public class StatementPrinterTests
         };
         
 
-        AbstractStatementPrinter statementPrinter = new TextPrinter();
-        var result = statementPrinter.Print(invoice);
+        AbstractStatementPrinter statementPrinter = new TextPrinter(invoice);
+        var result = statementPrinter.Print();
 
         Approvals.Verify(result);
     }
@@ -209,8 +208,8 @@ public class StatementPrinterTests
             henryVPerformance2
         };
 
-        AbstractStatementPrinter statementPrinter = new XMLPrinter();
-        var result = statementPrinter.Print(invoice);
+        AbstractStatementPrinter statementPrinter = new XMLPrinter(invoice);
+        var result = statementPrinter.Print();
 
         Approvals.Verify(result);
     }

@@ -1,6 +1,6 @@
 ﻿using TheatricalPlayersRefactoringKata.Models;
 
-namespace TheatricalPlayersRefactoringKata.Tools;
+namespace TheatricalPlayersRefactoringKata.Core;
 
 public abstract class AbstractPerformanceCalculator
 {

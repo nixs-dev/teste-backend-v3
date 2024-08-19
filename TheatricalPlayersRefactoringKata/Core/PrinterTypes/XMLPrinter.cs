@@ -1,17 +1,22 @@
 ﻿using System.Xml.Linq;
 using TheatricalPlayersRefactoringKata.Models;
 
-namespace TheatricalPlayersRefactoringKata.Tools.PrinterTypes;
+namespace TheatricalPlayersRefactoringKata.Core.PrinterTypes;
 
 public class XMLPrinter : AbstractStatementPrinter
 {
-    public override string Print(Invoice invoice)
+    public override string Extension { get => "xml"; }
+
+    public XMLPrinter(Invoice invoice) : base(invoice) { }
+
+    public override string Print()
     {
         List<XElement> items = new List<XElement> { };
         float totalAmount = 0;
         int totalCredits = 0;
+        string xmlDeclaration = "﻿<?xml version=\"1.0\" encoding=\"utf-8\"?>";
 
-        foreach (Performance performance in invoice.Performances)
+        foreach (Performance performance in this.Invoice.Performances)
         {
             AbstractPerformanceCalculator? performanceCalculator = PerformanceCalculatorFactory.Build(performance) ?? throw new Exception("Gênero inválido");
 
@@ -28,11 +33,10 @@ public class XMLPrinter : AbstractStatementPrinter
         }
 
         XDocument xmlOutput = new XDocument(
-            new XDeclaration("1.0", "utf-8", null),
             new XElement("Statement",
                 new XAttribute(XNamespace.Xmlns + "xsi", "http://www.w3.org/2001/XMLSchema-instance"),
                 new XAttribute(XNamespace.Xmlns + "xsd", "http://www.w3.org/2001/XMLSchema"),
-                new XElement("Customer", invoice.Customer),
+                new XElement("Customer", this.Invoice.Customer),
                 new XElement("Items", items),
                 new XElement("AmountOwed", totalAmount),
                 new XElement("EarnedCredits", totalCredits)
@@ -40,6 +44,6 @@ public class XMLPrinter : AbstractStatementPrinter
         );
        
 
-        return xmlOutput.ToString();
+        return xmlDeclaration + "\n" + xmlOutput.ToString();
     }
 }

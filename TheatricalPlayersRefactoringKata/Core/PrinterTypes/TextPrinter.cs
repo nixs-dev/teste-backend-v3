@@ -1,18 +1,22 @@
 ﻿using System.Globalization;
 using TheatricalPlayersRefactoringKata.Models;
 
-namespace TheatricalPlayersRefactoringKata.Tools.PrinterTypes;
+namespace TheatricalPlayersRefactoringKata.Core.PrinterTypes;
 
 public class TextPrinter : AbstractStatementPrinter
 {
-    public override string Print(Invoice invoice)
+    public override string Extension { get => "txt"; }
+
+    public TextPrinter(Invoice invoice) : base(invoice) {}
+
+    public override string Print()
     {
         float totalAmount = 0;
         int volumeCredits = 0;
-        string result = string.Format("Statement for {0}\n", invoice.Customer);
+        string result = string.Format("Statement for {0}\n", this.Invoice.Customer);
         CultureInfo cultureInfo = new CultureInfo("en-US");
 
-        foreach (var performance in invoice.Performances)
+        foreach (var performance in this.Invoice.Performances)
         {
             AbstractPerformanceCalculator? performanceCalculator = PerformanceCalculatorFactory.Build(performance) ?? throw new Exception("Gênero inválido");
 

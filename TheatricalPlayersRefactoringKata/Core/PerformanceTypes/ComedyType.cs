@@ -1,6 +1,6 @@
 ﻿using TheatricalPlayersRefactoringKata.Models;
 
-namespace TheatricalPlayersRefactoringKata.Tools.PerformanceTypes;
+namespace TheatricalPlayersRefactoringKata.Core.PerformanceTypes;
 
 
 public class ComedyType : AbstractPerformanceCalculator

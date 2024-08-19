@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
 using TheatricalPlayersRefactoringKata.DTOs;
 using TheatricalPlayersRefactoringKata.Models;
-using TheatricalPlayersRefactoringKata.Tools;
+using TheatricalPlayersRefactoringKata.Core;
+using TheatricalPlayersRefactoringKata.Services;
+using TheatricalPlayersRefactoringKata.Core.PrinterTypes;
 
 namespace TheatricalPlayersRefactoringKata.Controllers;
 
@@ -12,10 +14,12 @@ namespace TheatricalPlayersRefactoringKata.Controllers;
 public class InvoiceController : ControllerBase
 {
     private readonly TheatreContext _context;
+    private readonly PrintInvoiceService _printInvoiceService;
 
-    public InvoiceController(TheatreContext context)
+    public InvoiceController(TheatreContext context, PrintInvoiceService printInvoiceService)
     {
         _context = context;
+        _printInvoiceService = printInvoiceService;
     }
 
     // GET: api/invoice
@@ -39,11 +43,11 @@ public class InvoiceController : ControllerBase
 
         if (Request.Query.TryGetValue("format", out StringValues format))
         {
-            AbstractStatementPrinter? printer = StatementPrinterFactory.Build(format);
+            AbstractStatementPrinter? printer = StatementPrinterFactory.Build(invoice, format);
 
             if (printer == null) return BadRequest("Formato inválido!");
 
-            return Ok(printer.Print(invoice));
+            return Ok(printer.Print());
         }
 
         return Ok(invoice);
@@ -51,32 +55,34 @@ public class InvoiceController : ControllerBase
 
     // POST: api/invoice
     [HttpPost]
-    public async Task<ActionResult<Invoice>> Create([FromBody] InvoiceCreationRequest request)
+    public async Task<ActionResult<Invoice>> Create([FromBody] InvoiceCreationRequestDTO request)
     {
         Invoice invoice = new Invoice();
         invoice.Customer = request.Customer;
 
         _context.invoices.Add(invoice);
 
-        foreach (int key in request.Performances.Keys)
+        foreach (DTOs.PerformanceDTO performanceDto in request.Performances)
         {
-            Play? play = await _context.plays.FindAsync(key);
+            Play? play = await _context.plays.FindAsync(performanceDto.PlayId);
 
             if(play == null)
             {
-                return NotFound("Peça com ID " + key.ToString() + " não encontrada!");
+                return NotFound("Peça com ID " + performanceDto.PlayId.ToString() + " não encontrada!");
             }
 
-            Performance performance = new Performance();
+            Models.Performance performance = new Models.Performance();
             performance.Invoice = invoice;
             performance.Play = play;
-            performance.Audience = request.Performances.GetValueOrDefault(key);
+            performance.Audience = performanceDto.Audience;
 
             _context.performances.Add(performance);
         }
 
         
         await _context.SaveChangesAsync();
+
+        await this._printInvoiceService.PrintInvoiceAsync(new XMLPrinter(invoice));
 
         return Ok();
     }

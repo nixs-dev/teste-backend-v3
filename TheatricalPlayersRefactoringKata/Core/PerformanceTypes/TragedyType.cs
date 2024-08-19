@@ -1,7 +1,7 @@
 ﻿using TheatricalPlayersRefactoringKata.Models;
-using TheatricalPlayersRefactoringKata.Tools;
+using TheatricalPlayersRefactoringKata.Core;
 
-namespace TheatricalPlayersRefactoringKata.Tools.PerformanceTypes;
+namespace TheatricalPlayersRefactoringKata.Core.PerformanceTypes;
 
 public class TragedyType : AbstractPerformanceCalculator
 {
