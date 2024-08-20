@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using TheatricalPlayersRefactoringKata.DTOs;
 using TheatricalPlayersRefactoringKata.Models;
 
 namespace TheatricalPlayersRefactoringKata.Controllers.Controllers;
@@ -31,7 +32,7 @@ public class PlayController : ControllerBase
 
         if (play == null)
         {
-            return NotFound();
+            return NotFound("Peça não encontrada!");
         }
 
         return play;
@@ -39,8 +40,18 @@ public class PlayController : ControllerBase
 
     // POST: api/play
     [HttpPost]
-    public async Task<ActionResult<Play>> Create(Play play)
+    public async Task<ActionResult<Play>> Create([FromBody] PlayDTO request)
     {
+        if (!ModelState.IsValid)
+        {
+            return BadRequest(ModelState);
+        }
+
+        Play play = new Play();
+        play.Name = request.Name;
+        play.Lines = request.Lines;
+        play.Type = request.Type;
+
         _context.plays.Add(play);
         await _context.SaveChangesAsync();
 
@@ -53,7 +64,7 @@ public class PlayController : ControllerBase
     {
         if (id != play.Id)
         {
-            return BadRequest();
+            return BadRequest("ID inválido!");
         }
 
         _context.Entry(play).State = EntityState.Modified;
@@ -66,7 +77,7 @@ public class PlayController : ControllerBase
         {
             if (!Exists(id))
             {
-                return NotFound();
+                return NotFound("Peça não encontrada!");
             }
             else
             {
@@ -74,7 +85,7 @@ public class PlayController : ControllerBase
             }
         }
 
-        return NoContent();
+        return Ok();
     }
 
     // DELETE: api/play/5
@@ -84,13 +95,13 @@ public class PlayController : ControllerBase
         var play = await _context.plays.FindAsync(id);
         if (play == null)
         {
-            return NotFound();
+            return NotFound("Peça não encontrada!");
         }
 
         _context.plays.Remove(play);
         await _context.SaveChangesAsync();
 
-        return NoContent();
+        return Ok();
     }
 
     private bool Exists(int id)

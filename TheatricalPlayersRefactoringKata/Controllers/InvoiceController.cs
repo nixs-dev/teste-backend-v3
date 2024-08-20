@@ -29,19 +29,19 @@ public class InvoiceController : ControllerBase
         return await _context.invoices.ToListAsync();
     }
 
-    // GET: api/invoice/5
+    // GET: api/invoice/5/xml
     [HttpGet("{id}")]
-    public async Task<ActionResult> Get(int id)
+    public async Task<ActionResult> Get(int id, [FromQuery] string? format = null)
     {
-        Invoice invoice = await _context.invoices.Include(i => i.Performances)
+        Invoice? invoice = await _context.invoices.Include(i => i.Performances)
                                         .ThenInclude(p => p.Play)
                                         .Where(i => i.Id == id)
-                                        .FirstAsync();
+                                        .FirstOrDefaultAsync();
 
-        if (invoice == null) return NotFound();
+        if (invoice == null) return NotFound("Extrato não encontrado!");
 
 
-        if (Request.Query.TryGetValue("format", out StringValues format))
+        if (!String.IsNullOrEmpty(format))
         {
             AbstractStatementPrinter? printer = StatementPrinterFactory.Build(invoice, format);
 
@@ -89,32 +89,26 @@ public class InvoiceController : ControllerBase
 
     // PUT: api/invoice/5
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, Invoice invoice)
+    public async Task<IActionResult> Update(int id, InvoiceUpdateRequestDTO request)
     {
-        if (id != invoice.Id)
+        if (id != request.Id)
         {
-            return BadRequest();
+            return BadRequest("ID inválido!");
         }
 
-        _context.Entry(invoice).State = EntityState.Modified;
-
-        try
+        if (!Exists(id))
         {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!Exists(id))
-            {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
+            return NotFound("Extrato não encontrado!");
         }
 
-        return NoContent();
+        Invoice? invoice = await _context.invoices.FindAsync(id);
+        invoice.Customer = request.Customer;
+
+        _context.Update(invoice);
+
+        await _context.SaveChangesAsync();
+
+        return Ok();
     }
 
     // DELETE: api/invoice/5
@@ -124,13 +118,13 @@ public class InvoiceController : ControllerBase
         var invoice = await _context.invoices.FindAsync(id);
         if (invoice == null)
         {
-            return NotFound();
+            return NotFound("Extrato não encontrado!");
         }
 
         _context.invoices.Remove(invoice);
         await _context.SaveChangesAsync();
 
-        return NoContent();
+        return Ok();
     }
 
     private bool Exists(int id)
